@@ -9,7 +9,7 @@ import java.util.Queue;
  * @description: demo2
  */
 public class demo2 {
-    demo a=new demo();
+
 
     public static void main(String[] args) {
 //      String a=new String("d");

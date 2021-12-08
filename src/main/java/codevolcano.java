@@ -15,6 +15,35 @@ public class codevolcano {
 
     }
 
+    /**
+     * 128. 最长连续序列
+     * 想法：放入set，因为重复不算递增了，然后遍历，判断当前元素-1存在不，目的是找到递增的第一个节点。
+     * 不存在，判断+1存在不，同时记录长度，同时遍历下一个节点。
+     *
+     * @param nums
+     * @return
+     */
+    public int longestConsecutive(int[] nums) {
+    if(nums.length==0){return 0;}
+
+        int cout=1; //有元素最小是1。
+        HashSet<Integer> set = new HashSet<>();
+        for (int num : nums) {
+            set.add(num);
+        }
+        for (int num:set){//尽量用这个方式，不然你不知道用nums[i],i会不会越界。
+            if (!set.contains(num-1)) {
+                int j=num;
+                while (set.contains(j+1)){
+                    j++;
+                   cout=Math.max(cout,j-num+1);//j-num+1不理解，从1到10一共11个数。
+                }
+            }
+        }
+        return cout;
+    }
+
+
 
     /**
      * 快速排序，难点在于交换位置后，会认为原始值被覆盖了，其实没有，最后留下来的是base
@@ -69,7 +98,6 @@ public class codevolcano {
         }
         return stdu.toString();
     }
-
 
 
     /**
@@ -370,6 +398,7 @@ public class codevolcano {
         return function5(d, target);
 
     }
+
     int[] function5(int[] nums, int target) {
         int min = -1;
         int max = nums.length;
@@ -418,25 +447,28 @@ public class codevolcano {
         return ' ';
     }
 
-    /**剑指 Offer 54. 二叉搜索树的第 k 大节点
+    /**
+     * 剑指 Offer 54. 二叉搜索树的第 k 大节点
+     *
      * @param root
      * @param k
-     * @return
-     * 我的想法是，右子树比左大，中序倒置，就是按照大小排序了，然后再根据k大小取树。
+     * @return 我的想法是，右子树比左大，中序倒置，就是按照大小排序了，然后再根据k大小取树。
      */
-    int s=Integer.MIN_VALUE;
+    int s = Integer.MIN_VALUE;
     int k;
+
     public int kthLargest(TreeNode root, int k) {
-        this.k=k;
+        this.k = k;
         find(root);
         return s;
     }
-    void find(TreeNode root){
-        if(root==null)return;
+
+    void find(TreeNode root) {
+        if (root == null) return;
         find(root.right);
-        if(k==0)return;//已经找到，提前终止。
-        k=k-1;
-        if (k==0)s=root.val;
+        if (k == 0) return;//已经找到，提前终止。
+        k = k - 1;
+        if (k == 0) s = root.val;
 //        s=root.val;
         find(root.left);
     }
@@ -447,6 +479,7 @@ public class codevolcano {
      * 先序遍历到某个节点后，如果这个节点是p或者q，或者二者都是，就直接返回，如果是null就return null，然后递归左右子树。
      * 递归完后，返回的左右子树left，right，如果只有一个有结果就直接返回，比如left=p,那q肯定是left的左右子树，不管在哪，都返回q，说明在同一侧，都有结果就是root，在两侧，都没结果就是null
      * 最大公共节点。
+     *
      * @param root
      * @param p
      * @param q
@@ -454,30 +487,42 @@ public class codevolcano {
      */
     public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
 
-        if(root==q||root==p||root==null){return root;}
-        TreeNode left=lowestCommonAncestor(root.left,p,q);
-        TreeNode right=lowestCommonAncestor(root.right,p,q);
-        if(left==null&&right==null){return null;}
-        if(left!=null&&right!=null){return root;}
-        if(left!=null){return left;}
-        else {return right;}
+        if (root == q || root == p || root == null) {
+            return root;
+        }
+        TreeNode left = lowestCommonAncestor(root.left, p, q);
+        TreeNode right = lowestCommonAncestor(root.right, p, q);
+        if (left == null && right == null) {
+            return null;
+        }
+        if (left != null && right != null) {
+            return root;
+        }
+        if (left != null) {
+            return left;
+        } else {
+            return right;
+        }
     }
 
     /**
      * 剑指68-｜最大公共祖先，这个是二叉搜索树,直接比较2个节点val和root.val就能判断位置。上面那个题比较难。
+     *
      * @param root
      * @param p
      * @param q
      * @return
      */
-    public TreeNode lowestCommonAncestor1(TreeNode root,TreeNode p,TreeNode q){
-        if(root.val<p.val&&root.val<q.val){return lowestCommonAncestor1(root.right,p,q);}
-        if(root.val>p.val&&root.val>q.val){return lowestCommonAncestor1(root.left,p,q);}
+    public TreeNode lowestCommonAncestor1(TreeNode root, TreeNode p, TreeNode q) {
+        if (root.val < p.val && root.val < q.val) {
+            return lowestCommonAncestor1(root.right, p, q);
+        }
+        if (root.val > p.val && root.val > q.val) {
+            return lowestCommonAncestor1(root.left, p, q);
+        }
         return root;
     }
 }
-
-
 
 
 /**
