@@ -24,9 +24,15 @@ public class demo2 {
 //        System.out.println(ad.equals(as));
 //        ArrayList v=new ArrayList();
 
-        Queue a=new LinkedList();
-        a.add(null);
-        a.poll();
-        System.out.println(a.size());
+        int de=21;
+        String s="😊";
+        s.length();
+
+        dd(de);
+        System.out.println(s.length());
+    }
+
+    static void dd(int d){
+        d=2;
     }
 }

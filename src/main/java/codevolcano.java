@@ -1,3 +1,4 @@
+import java.sql.Struct;
 import java.util.*;
 
 /**
@@ -15,38 +16,75 @@ public class codevolcano {
 
     }
 
+
     /**
      * 128. 最长连续序列，要求数值+1连续递增。
      * 想法：放入set，因为重复不算递增了，然后遍历，判断当前元素-1存在不，目的是找到递增的第一个节点。
      * 不存在，判断+1存在不，同时记录长度，同时遍历下一个节点。
-     *这个复杂度是O(n),不要想当然认为for循环里面加个while就是O（n2），要看循环次数。
+     * 这个复杂度是O(n),不要想当然认为for循环里面加个while就是O（n2），要看循环次数。
+     *
      * @param nums
      * @return
      */
     public int longestConsecutive(int[] nums) {
-    if(nums.length==0){return 0;}
+        if (nums.length == 0) {
+            return 0;
+        }
 
-        int cout=1; //有元素最小是1。
+        int cout = 1; //有元素最小是1。
         HashSet<Integer> set = new HashSet<>();
         for (int num : nums) {
             set.add(num);
         }
-        for (int num:set){//尽量用这个方式，不然你不知道用nums[i],i会不会越界。
-            if (!set.contains(num-1)) {
-                int j=num;
-                while (set.contains(j+1)){
+        for (int num : set) {//尽量用这个方式，不然你不知道用nums[i],i会不会越界。
+            if (!set.contains(num - 1)) {
+                int j = num;
+                while (set.contains(j + 1)) {
                     j++;
-                   cout=Math.max(cout,j-num+1);//j-num+1不理解，从1到10一共11个数。
+                    cout = Math.max(cout, j - num + 1);//j-num+1不理解，从1到10一共11个数。
                 }
             }
         }
         return cout;
     }
 
+    /**
+     *     199 二叉树的右视图,思路：右子树不空，傻逼了吧，直接bfs找最后一个元素加入res就可以了，或者dfs，根，右，左。返回。左视图同理，层序遍历，加个flag
+     * @param root
+     * @return
+     */
+    public List<Integer> rightSideView(TreeNode root) {
+
+        List<Integer> list = new LinkedList<>();
+        Queue<TreeNode> queue = new LinkedList();
+        if (root != null) {
+            queue.add(root);
+        }
+        while (!queue.isEmpty()) {
+            List<Integer> temp = new ArrayList<>();
+            int cout = queue.size();
+            while (cout != 0) {
+                TreeNode res = queue.poll();
+                cout--;
+                if (res != null) {
+                    temp.add(res.val);
+                    if (res.left != null) {
+                        queue.add(res.left);
+                    }
+                    if (res.right != null) {
+                        queue.add(res.right);
+                    }
+                }
+            }
+            list.add(temp.get(temp.size() - 1));
+
+        }
+        return list;
+    }
 
 
     /**
-     * 快速排序，难点在于交换位置后，会认为原始值被覆盖了，其实没有，最后留下来的是base
+     * 快速排序，难点在于交换位置后，会认为原始值被覆盖了，其实没有，最后留下来的是base，注意等于号。
      *
      * @param num
      * @param left
@@ -60,14 +98,14 @@ public class codevolcano {
         int l = left;
         int r = right;
         while (l < r) {
-            while (num[r] > base && l < r) {
+            while (num[r] >=base && l < r) {
                 r--;
             }
             if (l < r) {
                 num[l] = num[r];//不互相换位置是因为左边的还没有被比较过。
                 l++;
             }
-            while (num[l] < base && l < r) {
+            while (num[l] <= base && l < r) {
                 l++;
             }
             if (l < r) {
@@ -81,7 +119,92 @@ public class codevolcano {
 
     }
 
+    /**
+     * 写法2
+     * @param nums
+     */
+    void quickSort(int nums[]) {
+        int left=0;
+        int right=nums.length-1;
+        function(nums,left,right);
+    }
+    void function(int[] nums,int left,int right){
+        if(left>=right){
+            return;
+        }
+        int i=left;
+        int j=right;
+        int base=nums[left];
+        while (i<j){
+            while (i<j&&nums[j]>=base)
+            {
+                j--;
+            }
+            if(i<j){
+                nums[i]=nums[j];
+            }
+            while (i<j&&nums[i]<=base){
+                i++;
+            }
+            if(i<j){
+                nums[j]=nums[i];
+            }
+        }
+        nums[i]=base;
+        function(nums,left,i-1);
+        function(nums,i+1,right);
+    }
+    void QuickSort(int[] nums,int left,int right){
+        if(left>=right){return;}
+        int i=left;
+        int j=right;
+        while (i<j){
+            while (i<j&&nums[left]<=nums[j]){j--;}
+            while (i<j&&nums[i]<=nums[left]){i++;}
+            swap(nums,i,j);
+        }
+        swap(nums,i,left);
+        QuickSort(nums,left,i-1);
+        QuickSort(nums,i+1,right);
+    }
+    void swap(int[] nums,int i,int j){
+        int temp=nums[i];
+        nums[i]=nums[j];
+        nums[j]=temp;
+    }
+    /**
+     * 56 合并区间,想法很简单，就是写起来有点复杂，二维数组的题写的比较少。list还能加数组。
+     * 就是。排序后，找到合并的第一个区间，从第一个开始比较，int[0][1]>int[1][0]?
+     * 有重合就合并，（合并的方式就是new一个新的数组{start,end}的形式。）不重合就加入结果集。
+     * @param intervals
+     * @return
+     */
+        public int[][] merge(int[][] intervals) {
+            List<int[]> ans = new ArrayList<>();
+            Arrays.sort(intervals, (o1, o2) -> o1[0] == o2[0] ? o1[1] - o2[1] : o1[0] - o2[0]);
+            int start = intervals[0][0], end = intervals[0][1];
+            for (int i = 1; i < intervals.length; i++){
+                if (intervals[i][0] <= end){//两个区间有重叠
+                    end = Math.max(end, intervals[i][1]);
+                }else{
+                    //两个区间没有重叠，保存[start,end]，然后更新
+                    ans.add(new int[] {start, end});
+                    start = intervals[i][0];
+                    end = intervals[i][1];
+                }
+            }
+            ans.add(new int[] {start, end});
+            int[][] res = new int[ans.size()][2];
+            for (int i = 0; i < res.length; i++){
+                res[i] = ans.get(i);
+            }
+            return res;
+        }
 
+
+
+    /**下面是剑指offer*************/
+    /*****************************************************************************************************************************/
     //剑指05，替换空格。
     public String replaceSpace(String s) {
         StringBuilder stdu = new StringBuilder(s);
@@ -448,6 +571,16 @@ public class codevolcano {
     }
 
     /**
+     * 剑指53，二分变种，寻找target出现多少次。
+     * @param nums
+     * @param target
+     * @return
+     */
+    public int search(int[] nums, int target) {
+    //todo
+    return 0;
+        }
+    /**
      * 剑指 Offer 54. 二叉搜索树的第 k 大节点
      *
      * @param root
@@ -524,6 +657,29 @@ public class codevolcano {
     }
 }
 
+class eightsorts{
+    //冒泡排序，这里优化了一下，没有比较直接终止。说明都排好序了。O(n2),O(n)
+    void bubbleSort(int nums[]){
+    int len=nums.length;
+    boolean flag=true;
+        for (int i = 0; i < len; i++) {
+            for (int j = i; j < len; j++) {
+                if (nums[i]>nums[j]){
+                    int swap=nums[i];
+                    nums[i]=nums[j];
+                    nums[j]=nums[i];
+                    flag= false;
+                }
+            }
+            if (flag)break;
+        }
+    }
+
+
+
+
+}
+
 
 /**
  * 09 双栈实现队列,pop的时候，如果第二个栈空的，要把第一个栈清空。全部放入第二个栈。
@@ -551,7 +707,9 @@ class StackQueue {
     }
 }
 
-
+/**
+ * 定义TreeNode{}
+ */
 class TreeNode {
     int val;
     TreeNode left;
@@ -570,3 +728,5 @@ class TreeNode {
         this.right = right;
     }
 }
+
+
