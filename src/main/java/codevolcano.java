@@ -1,4 +1,3 @@
-import java.sql.Struct;
 import java.util.*;
 
 /**
@@ -49,7 +48,8 @@ public class codevolcano {
     }
 
     /**
-     *     199 二叉树的右视图,思路：右子树不空，傻逼了吧，直接bfs找最后一个元素加入res就可以了，或者dfs，根，右，左。返回。左视图同理，层序遍历，加个flag
+     * 199 二叉树的右视图,思路：右子树不空，傻逼了吧，直接bfs找最后一个元素加入res就可以了，或者dfs，根，右，左。返回。左视图同理，层序遍历，加个flag
+     *
      * @param root
      * @return
      */
@@ -98,7 +98,7 @@ public class codevolcano {
         int l = left;
         int r = right;
         while (l < r) {
-            while (num[r] >=base && l < r) {
+            while (num[r] >= base && l < r) {
                 r--;
             }
             if (l < r) {
@@ -121,87 +121,120 @@ public class codevolcano {
 
     /**
      * 写法2
+     *
      * @param nums
      */
     void quickSort(int nums[]) {
-        int left=0;
-        int right=nums.length-1;
-        function(nums,left,right);
+        int left = 0;
+        int right = nums.length - 1;
+        function(nums, left, right);
     }
-    void function(int[] nums,int left,int right){
-        if(left>=right){
+
+    void function(int[] nums, int left, int right) {
+        if (left >= right) {
             return;
         }
-        int i=left;
-        int j=right;
-        int base=nums[left];
-        while (i<j){
-            while (i<j&&nums[j]>=base)
-            {
+        int i = left;
+        int j = right;
+        int base = nums[left];
+        while (i < j) {
+            while (i < j && nums[j] >= base) {
                 j--;
             }
-            if(i<j){
-                nums[i]=nums[j];
+            if (i < j) {
+                nums[i] = nums[j];
             }
-            while (i<j&&nums[i]<=base){
+            while (i < j && nums[i] <= base) {
                 i++;
             }
-            if(i<j){
-                nums[j]=nums[i];
+            if (i < j) {
+                nums[j] = nums[i];
             }
         }
-        nums[i]=base;
-        function(nums,left,i-1);
-        function(nums,i+1,right);
+        nums[i] = base;
+        function(nums, left, i - 1);
+        function(nums, i + 1, right);
     }
-    void QuickSort(int[] nums,int left,int right){
-        if(left>=right){return;}
-        int i=left;
-        int j=right;
-        while (i<j){
-            while (i<j&&nums[left]<=nums[j]){j--;}
-            while (i<j&&nums[i]<=nums[left]){i++;}
-            swap(nums,i,j);
+
+    void QuickSort(int[] nums, int left, int right) {
+        if (left >= right) {
+            return;
         }
-        swap(nums,i,left);
-        QuickSort(nums,left,i-1);
-        QuickSort(nums,i+1,right);
+        int i = left;
+        int j = right;
+        while (i < j) {
+            while (i < j && nums[left] <= nums[j]) {
+                j--;
+            }
+            while (i < j && nums[i] <= nums[left]) {
+                i++;
+            }
+            swap(nums, i, j);
+        }
+        swap(nums, i, left);
+        QuickSort(nums, left, i - 1);
+        QuickSort(nums, i + 1, right);
     }
-    void swap(int[] nums,int i,int j){
-        int temp=nums[i];
-        nums[i]=nums[j];
-        nums[j]=temp;
+
+    void swap(int[] nums, int i, int j) {
+        int temp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = temp;
     }
+
     /**
      * 56 合并区间,想法很简单，就是写起来有点复杂，二维数组的题写的比较少。list还能加数组。
      * 就是。排序后，找到合并的第一个区间，从第一个开始比较，int[0][1]>int[1][0]?
      * 有重合就合并，（合并的方式就是new一个新的数组{start,end}的形式。）不重合就加入结果集。
+     *
      * @param intervals
      * @return
      */
-        public int[][] merge(int[][] intervals) {
-            List<int[]> ans = new ArrayList<>();
-            Arrays.sort(intervals, (o1, o2) -> o1[0] == o2[0] ? o1[1] - o2[1] : o1[0] - o2[0]);
-            int start = intervals[0][0], end = intervals[0][1];
-            for (int i = 1; i < intervals.length; i++){
-                if (intervals[i][0] <= end){//两个区间有重叠
-                    end = Math.max(end, intervals[i][1]);
-                }else{
-                    //两个区间没有重叠，保存[start,end]，然后更新
-                    ans.add(new int[] {start, end});
-                    start = intervals[i][0];
-                    end = intervals[i][1];
-                }
+    public int[][] merge(int[][] intervals) {
+        List<int[]> ans = new ArrayList<>();
+        Arrays.sort(intervals, (o1, o2) -> o1[0] == o2[0] ? o1[1] - o2[1] : o1[0] - o2[0]);
+        int start = intervals[0][0], end = intervals[0][1];
+        for (int i = 1; i < intervals.length; i++) {
+            if (intervals[i][0] <= end) {//两个区间有重叠
+                end = Math.max(end, intervals[i][1]);
+            } else {
+                //两个区间没有重叠，保存[start,end]，然后更新
+                ans.add(new int[]{start, end});
+                start = intervals[i][0];
+                end = intervals[i][1];
             }
-            ans.add(new int[] {start, end});
-            int[][] res = new int[ans.size()][2];
-            for (int i = 0; i < res.length; i++){
-                res[i] = ans.get(i);
-            }
-            return res;
         }
+        ans.add(new int[]{start, end});
+        int[][] res = new int[ans.size()][2];
+        for (int i = 0; i < res.length; i++) {
+            res[i] = ans.get(i);
+        }
+        return res;
+    }
 
-
+    /**
+     * 03无重复的最长子串
+     *
+     * @param s
+     * @return
+     */
+    public int lengthOfLongestSubstring(String s) {
+        //思路：DFS，滑动窗口,left为最大不重复的左值下标，max是长度。i是右值下标
+        if (s.length() == 0) {
+            return -1;
+        }
+        HashMap<Character, Integer> map = new HashMap<>();
+        char[] a = s.toCharArray();
+        int left = 0, max = 0;
+        for (int i = 0; i < s.length(); i++) {
+            if (map.containsKey(a[i])) {
+                left = Math.max(left, map.get(a[i]) + 1);//这里要用max比较是因为abba到a的时候，map.get(a)+1=0,不能让左下标变小了。所以取最大值。
+            }
+            map.put(a[i], i);
+            max = Math.max(max, i - left + 1);// 右-左+1；
+        }
+        return max;
+    }
 
     /**下面是剑指offer*************/
     /*****************************************************************************************************************************/
@@ -318,6 +351,40 @@ public class codevolcano {
 
         return (A.val == B.val) && dfs1(A.left, B.left) && dfs1(A.right, B.right);
     }
+
+    /**
+     * 15 3数之和。O(n2)
+     * @param nums
+     * @return
+     */
+    public List<List<Integer>> threeSum(int[] nums) {
+        List<List<Integer>> res=new ArrayList<>();
+        if(nums==null||nums.length<3){return res;}
+        int len=nums.length;
+        Arrays.sort(nums);
+        for(int i=0;i<nums.length;i++){
+            if(nums[i]>0){break;}
+            if(i>0&&nums[i]==nums[i-1]){
+                continue;
+            }
+            int L=i+1;
+            int R=len-1;
+            while(L<R){
+                int sum=nums[i]+nums[L]+nums[R];
+                if(sum==0){
+                    res.add(Arrays.asList(nums[i],nums[L],nums[R]));
+                    while(L<R&&nums[L]==nums[L+1]){L++;}
+                    while(L<R&&nums[R]==nums[R-1]){R--;}
+                    L++;
+                    R--;
+                }
+                else if(sum>0){R--;}
+                else {L++;}
+            }
+        }
+        return res;
+    }
+
 
     /**
      * 剑指27，镜像二叉树。前序遍历，然后temp存一下左子树，left=(root.right),right=(temp);
@@ -572,14 +639,16 @@ public class codevolcano {
 
     /**
      * 剑指53，二分变种，寻找target出现多少次。
+     *
      * @param nums
      * @param target
      * @return
      */
     public int search(int[] nums, int target) {
-    //todo
-    return 0;
-        }
+        //todo 53二分变种
+        return 0;
+    }
+
     /**
      * 剑指 Offer 54. 二叉搜索树的第 k 大节点
      *
@@ -657,30 +726,135 @@ public class codevolcano {
     }
 }
 
-class eightsorts{
+/**
+ * 8个排序。
+ */
+class eightsorts {
     //冒泡排序，这里优化了一下，没有比较直接终止。说明都排好序了。O(n2),O(n)
-    void bubbleSort(int nums[]){
-    int len=nums.length;
-    boolean flag=true;
+    void bubbleSort(int nums[]) {
+        int len = nums.length;
+        boolean flag = true;
         for (int i = 0; i < len; i++) {
             for (int j = i; j < len; j++) {
-                if (nums[i]>nums[j]){
-                    int swap=nums[i];
-                    nums[i]=nums[j];
-                    nums[j]=nums[i];
-                    flag= false;
+                if (nums[i] > nums[j]) {
+                    int swap = nums[i];
+                    nums[i] = nums[j];
+                    nums[j] = nums[i];
+                    flag = false;
                 }
             }
-            if (flag)break;
+            if (flag) break;
         }
     }
 
 
-
-
 }
 
+/**
+ * LRU 终于来了。要实现双向链表的api
+ */
+class LRUCache {
+    private HashMap<Integer, Node> map;
+    private DoubleList cache;
+    private int cap;
 
+    public LRUCache(int capacity) {
+        this.cap=capacity;
+        map=new HashMap<>();
+        cache=new DoubleList();
+    }
+
+    public int get(int key) {
+        if(map.containsKey(key)){
+            Node node=map.get(key);
+            put(key,node.val);
+            return node.val;
+        }
+        else {return -1;}
+    }
+
+    public void put(int key, int value) {
+        Node node=new Node(key,value);
+        if(map.containsKey(key)){
+            Node temp=map.get(key);
+            cache.remove(temp);
+            map.put(key,node);
+            cache.addFirst(node);
+        }
+        else {
+
+            if(cache.size()+1>cap){
+              Node temp1=  cache.removeLast();
+              map.remove(temp1.key);
+            }
+            cache.addFirst(node);
+            map.put(key,node);
+        }
+    }
+}
+
+/**
+ * node, map 放<key,node>，和双向链表。
+ */
+class Node {
+    public int key, val;
+    public Node next, prev;
+    public Node(int k, int v) {
+        this.key = k;
+        this.val = v;
+    }
+}
+/**
+ * 双向链表。
+ */
+class DoubleList {
+
+    private Node head, tail;
+    private int size;
+
+    public void addFirst(Node node) {
+        if(head==null){
+            head=tail=node;
+        }
+       else {
+            node.next=head;
+            head.prev=node;
+            head=node;
+        }
+       size++;
+    }
+
+
+    public void remove(Node node) {
+         if(head==node&&node==tail){
+            head=null;
+            tail=null;
+        }
+        else if(node==head){
+            head=head.next;
+            head.prev=null;
+        }
+        else if(node==tail){
+            tail=tail.prev;
+            tail.next=null;
+        }else {
+            node.prev.next=node.next;
+            node.next.prev=node.prev;
+         }
+        size--;
+
+    }
+
+    public Node removeLast() {
+        Node res=tail;
+        remove(res);
+        return res;
+    }
+
+    public int size() {
+        return size;
+    }
+}
 /**
  * 09 双栈实现队列,pop的时候，如果第二个栈空的，要把第一个栈清空。全部放入第二个栈。
  */
