@@ -1,3 +1,5 @@
+import ListNode.ListNode;
+
 import java.util.*;
 
 /**
@@ -9,13 +11,59 @@ public class codevolcano {
 
     public static void main(String[] args) {
 
-
+        int s=new codevolcano().lengthOfLongestSubstring("abba");
+        System.out.println(s);
         // 唉，赶紧冲起来吧。时间不多了。
 //        System.out.println(a[a.length - 1][0]);
 
     }
 
 
+
+    /** 19. 删除链表的倒数第 N 个结点
+     * 注意点：fast是空的时候，说明删除头节点。
+     */
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+
+        ListNode fast=head,slow=head;
+        while(n!=0){
+            fast=fast.next;
+            n--;
+        }
+        if(fast==null){return head.next;}
+        while(fast.next!=null){
+            fast=fast.next;
+            slow=slow.next;
+        }
+        slow.next=slow.next.next;
+        return head;
+
+    }
+    /**
+     * 77 组合+剪枝优化。
+     */
+    List<List<Integer>> res=new LinkedList<>();
+    LinkedList<Integer> list=new LinkedList<>();
+    public List<List<Integer>> combine(int n, int k) {
+        function(n,k,1);
+        return res;
+    }
+    void function(int n,int k,int j){
+        if(list.size()==k){
+            res.add(new LinkedList<>(list));
+            return;
+        }
+        for(int i=j;i<=n-(k-list.size())+1;i++){
+            list.add(i);
+            function(n,k,i+1);
+            list.removeLast();
+        }
+    }
+
+
+    /** 33. 搜索旋转排序数组
+     *  二分变种了，将旋转数组重新排序了，找mid
+     */
     /**
      * 128. 最长连续序列，要求数值+1连续递增。
      * 想法：放入set，因为重复不算递增了，然后遍历，判断当前元素-1存在不，目的是找到递增的第一个节点。
@@ -182,6 +230,37 @@ public class codevolcano {
         nums[j] = temp;
     }
 
+
+    //82. 删除排序链表中的重复元素 II,
+
+    /**
+     * 注意点：
+     * 1. 头节点会被删除，所以要前区节点，然后用node.next作为当前节点.
+     * 2. 不要老是想着双节点，这里一个节点就可以，写的有点复杂，其实都是有必要的。
+     *
+     * @param head
+     * @return
+     */
+    public ListNode deleteDuplicates(ListNode head) {
+        if(head==null){return head;}
+        ListNode pre=new ListNode(0);
+        pre.next=head;
+        ListNode slow=pre;
+        while(slow.next!=null&&slow.next.next!=null){
+            if(slow.next.val==slow.next.next.val){
+                int x=slow.next.val;//这里要保留值，不然到下一个节点了找不到原节点值判断了。
+                while(slow.next!=null&&slow.next.val==x){
+                    slow.next=slow.next.next;//这里是把重复节点删除了（包括重复自身）
+                }
+            }else{
+                slow=slow.next;
+            }
+
+        }
+        return pre.next;
+    }
+
+
     /**
      * 56 合并区间,想法很简单，就是写起来有点复杂，二维数组的题写的比较少。list还能加数组。
      * 就是。排序后，找到合并的第一个区间，从第一个开始比较，int[0][1]>int[1][0]?
@@ -191,6 +270,7 @@ public class codevolcano {
      * @return
      */
     public int[][] merge(int[][] intervals) {
+
         List<int[]> ans = new ArrayList<>();
         Arrays.sort(intervals, (o1, o2) -> o1[0] == o2[0] ? o1[1] - o2[1] : o1[0] - o2[0]);
         int start = intervals[0][0], end = intervals[0][1];
@@ -219,19 +299,22 @@ public class codevolcano {
      * @return
      */
     public int lengthOfLongestSubstring(String s) {
-        //思路：DFS，滑动窗口,left为最大不重复的左值下标，max是长度。i是右值下标
+        //思路：滑动窗口,left为最大不重复的左值下标，max是长度。i是右值下标
         if (s.length() == 0) {
             return -1;
         }
         HashMap<Character, Integer> map = new HashMap<>();
         char[] a = s.toCharArray();
-        int left = 0, max = 0;
-        for (int i = 0; i < s.length(); i++) {
+        int left=0;//窗口左指针。
+        int max=0;//max=i-left+1;i是右指针。
+         for (int i = 0; i < s.length(); i++) {
             if (map.containsKey(a[i])) {
-                left = Math.max(left, map.get(a[i]) + 1);//这里要用max比较是因为abba到a的时候，map.get(a)+1=0,不能让左下标变小了。所以取最大值。
+                left = Math.max(left, map.get(a[i])+1 );
+                //保证左指针不会后退,abba,碰到第二个b的时候,left=map.get(b)+1=2,再碰到第二个a，map.get(a)+1=1;left肯定要取最值。
+                System.out.println("left=="+left);//这里要用max比较是因为abba到a的时候，map.get(a)+1=0,不能让左下标变小了。所以取最大值。
             }
             map.put(a[i], i);
-            max = Math.max(max, i - left + 1);// 右-左+1；
+            max = Math.max(max, i - left +1);// 右-左+1；
         }
         return max;
     }
@@ -329,8 +412,9 @@ public class codevolcano {
      *
      * @param A
      * @param B
-     * @return 思路：在A的每个节点都需要确认 是否和B一样(遍历A)，然后一样再判断子树
+     * @return 思路：在A的每个节点都需要确认 是否和B一样(遍历A)，然后一样再判断子树,
      * 判断子树：b==null 说明B完成匹配，A==null return false;
+     * 你可能想在function1里面找到A和B相同的地方然后执行dfs1，但是这个结果要保存下来和dfs1做｜｜运算，不能直接返回。
      * a.val!=b.val return false;
      */
     public boolean isSubStructure(TreeNode A, TreeNode B) {
@@ -436,6 +520,8 @@ public class codevolcano {
      * @return
      */
     public int[] levelOrder(TreeNode root) {
+
+
         Queue<TreeNode> queue = new LinkedList<>();
         queue.add(root);
         ArrayList<Integer> list = new ArrayList<>();
@@ -478,7 +564,6 @@ public class codevolcano {
             LinkedList<Integer> listc = new LinkedList<>();
             flag = !flag;
             while (d != 0) {
-
                 TreeNode temp = list.poll();
                 if (temp != null) {
                     if (flag) {
@@ -506,13 +591,13 @@ public class codevolcano {
     /**
      * 分治思想，就是递归参数，不好想，用map把中序遍历(value,key)放一遍，然后根据value查找索引。
      * 07重建二叉树，根据前序和中序遍历二叉树。
-     *
+     *麻烦在根索引的位置。
      * @param preorder
      * @param inorder
      * @return
      */
     //递归的时候，左右字树的边界不好确定。左子树好说，根结点是前序的下一位，
-    //右子树，根结点是前序+左字树长度+1
+    //右子树，根结点是前序+左字树长度+1 ，
     HashMap<Integer, Integer> map = new HashMap<>();
     int[] preorder;
 
@@ -522,12 +607,18 @@ public class codevolcano {
             return new TreeNode();
         }
         for (int i = 0; i < inorder.length; i++) {
-            int i1 = inorder[i];
-            map.put(i1, i);
+            map.put(inorder[i], i);
         }
         return recur(0, 0, inorder.length - 1);
     }
 
+    /**
+     *
+     * @param root 根索引
+     * @param left 左边界
+     * @param right 右边界。
+     * @return
+     */
     TreeNode recur(int root, int left, int right) {
         if (left > right) {
             return null;
@@ -545,17 +636,17 @@ public class codevolcano {
      * @param s 用set去从（不同索引下相同位置）。visit标识每一位是不是重复走过了，毕竟每次for循环都是从0开始。
      * @return
      */
-    Set<String> res = new HashSet<>();
+    Set<String> res1 = new HashSet<>();
 
     public String[] permutation(String s) {
 
         function3(s.toCharArray(), new StringBuilder(), new Boolean[s.length()]);
-        return res.toArray(new String[0]);
+        return res1.toArray(new String[0]);
     }
 
     void function3(char[] s, StringBuilder sb, Boolean[] visit) {
         if (s.length == sb.length()) {
-            res.add(sb.toString());
+            res1.add(sb.toString());
             return;
         }
         for (int i = 0; i < s.length; i++) {
@@ -570,50 +661,61 @@ public class codevolcano {
         }
     }
 
-
     //二分查找，不是最优版本，细节狂魔啊，左右边界搞不清楚。
 
     /**
-     * hot 34我这个版本不是最优解。应该2次二分，下次看
+     * hot 34多个版本都会了，左右边界的问题,注意mid=right+left/2 是偏左的，4个元素，mid=第二个元素，所以找右边界的时候要偏右
+     * 左边界：1。left<right 当num[mid]>=target :mid=right; 最后拿left当结果判断什么的。
+     *        2。left<=right 当num[mid]>=target :mid=right-1;最后判断一下left越界或者是否不等于targt这种情况-1，剩下返回left；
+     *右边界：1。left<right, 当num[mid]<=target (mid=left+(right-left)/2+1):mid=left; 最后拿right当结果判断什么的。这里+1为了
+     *                                                                              防止while不会结束。left=mid=right
+     *      2。left<=right 当num[mid]<=target :mid=left+1;最后判断一下right<0越界或者是否不等于targt这种情况-1，剩下返回right；
      *
+     *     2版本容易写。1版本适用性强。我写的1版本，反正会。
      * @param d
      * @param target
      * @return
      */
-    public int[] searchRange(int[] d, int target) {
+        int min=-1;
+        int max=-1;
+        public int[] searchRange(int[] nums, int target) {
+            if(nums.length==0||target>nums[nums.length-1]){return new int[]{-1,-1};}
+            return  function(nums,target);
 
-        if (d.length == 0 || target > d[d.length - 1]) {
-            return new int[]{-1, -1};
         }
-        return function5(d, target);
-
-    }
-
-    int[] function5(int[] nums, int target) {
-        int min = -1;
-        int max = nums.length;
-        int left = 0;
-        int right = nums.length - 1;
-        while (left <= right) {
-            int mid = left + (right - left) / 2;
-            if (nums[mid] == target) {
-                int temp = mid;
-                min = max = temp;
-                while (nums[temp--] == target) {
-                    min = mid;
+        int[] function(int[] nums,int target){
+            //找左边界
+            int left=0;
+            int right=nums.length-1;
+            while(left<right){
+                int mid=left+(right-left)/2;
+                if(nums[mid]<target){
+                    left=mid+1;
                 }
-                while (nums[temp++] == target) {
-                    max = mid;
+                else{
+                    right=mid;
                 }
-                return new int[]{min, max};
-            } else if (nums[mid] > target) {
-                right = mid;
-            } else {
-                left = mid;
             }
+            if(nums[left]==target){min=left;}else{min=-1;}
+            //如果左边界没找到或者在最大索引处，直接返回就是了不用找右边界。
+            if(min==-1){        return new int[]{-1,-1};}
+            if(min==nums.length-1||nums[min+1]!=target){return new int[]{min,min};}
+            left=0;
+            right=nums.length-1;
+            while(left<right){
+                int mid=left+(right-left)/2+1;
+                if(nums[mid]>target){
+                    right=mid-1;
+                }
+                else{
+                    left=mid;
+                }
+            }
+            if(nums[right]==target){max=right;}else{max=-1;}
+            return new int[]{min,max};
         }
-        return new int[]{-1, -1};
-    }
+
+
     //https://mp.weixin.qq.com/s?__biz=MzAxODQxMDM0Mw==&mid=2247485044&idx=1&sn=e6b95782141c17abe206bfe2323a4226&scene=21
 
     /**
@@ -646,6 +748,7 @@ public class codevolcano {
      */
     public int search(int[] nums, int target) {
         //todo 53二分变种
+        LinkedList list=new LinkedList<>();
         return 0;
     }
 
@@ -751,7 +854,7 @@ class eightsorts {
 }
 
 /**
- * LRU 终于来了。要实现双向链表的api
+ * LRU 终于来了。要实现双向链表的api，Doublelist提供api，node创建结构。
  */
 class LRUCache {
     private HashMap<Integer, Node> map;
@@ -766,8 +869,15 @@ class LRUCache {
 
     public int get(int key) {
         if(map.containsKey(key)){
+
+            cache.remove(map.get(key));
+            cache.addFirst(map.get(key));
+
+            //上面👆这2行可以直接用下面这2行替换。
             Node node=map.get(key);
             put(key,node.val);
+
+
             return node.val;
         }
         else {return -1;}
