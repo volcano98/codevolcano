@@ -1,4 +1,5 @@
-import ListNode.ListNode;
+package coding.serivce;
+
 
 import java.util.*;
 
@@ -7,57 +8,202 @@ import java.util.*;
  * create at:  2021/11/28  20:05
  * @description: 记录写过的算法
  */
+class ListNode {
+    int val;
+    ListNode next;
+
+    public ListNode(int val) {
+        this.val = val;
+    }
+}
+
 public class codevolcano {
 
     public static void main(String[] args) {
 
-        int s=new codevolcano().lengthOfLongestSubstring("abba");
+        int s = new codevolcano().lengthOfLongestSubstring("abba");
         System.out.println(s);
         // 唉，赶紧冲起来吧。时间不多了。
 //        System.out.println(a[a.length - 1][0]);
 
     }
 
+    /**
+     * 08 字符串转整数，简单化了，第一位判断正负，后面的正负和空格碰到就丢掉。
+     *
+     * @param s
+     * @return
+     */
+    public int myAtoi(String s) {
+        int status = 0;//1:+.  2:-
+        int res = 0;
+        for (char i : s.toCharArray()) {
+            if (status == 0 && i == ' ') {
+                continue;
+            } else if (status == 0 && i == '+') {
+                status = 1;
+            } else if (status == 0 && i == '-') {
+                status = 2;
+            } else if (i >= '0' && i <= '9') {
+                if (status == 0) {
+                    status = 1;
+                }
+                int temp = i - '0';
+                //下面这个判断结合res=res*10+temp看，判断上一次计算是否溢出。
+                if (res > (Integer.MAX_VALUE - temp) / 10) {
+
+                    if (status == 1) return Integer.MAX_VALUE;
+                    if (status == 2) return Integer.MIN_VALUE;
+                }
+                res = res * 10 + temp;
+            } else {
+                break;
+            }
+        }
+        return status % 2 == 1 ? res : -res;
+
+    }
 
 
-    /** 19. 删除链表的倒数第 N 个结点
+    /**
+     * 19. 删除链表的倒数第 N 个结点
      * 注意点：fast是空的时候，说明删除头节点。
      */
     public ListNode removeNthFromEnd(ListNode head, int n) {
 
-        ListNode fast=head,slow=head;
-        while(n!=0){
-            fast=fast.next;
+        ListNode fast = head, slow = head;
+        while (n != 0) {
+            fast = fast.next;
             n--;
         }
-        if(fast==null){return head.next;}
-        while(fast.next!=null){
-            fast=fast.next;
-            slow=slow.next;
+        if (fast == null) {
+            return head.next;
         }
-        slow.next=slow.next.next;
+        while (fast.next != null) {
+            fast = fast.next;
+            slow = slow.next;
+        }
+        slow.next = slow.next.next;
         return head;
 
     }
+
+    /**
+     * 41 缺失的第一个正数。原地置换，比如索引1位置放2，所以要判断nums[i]元素是否==nums[nums[i]-1]，不一样就换。
+     * 然后再遍历一遍，让nums[i]-1是否等于i，不想等就是缺少i+1这个元素。
+     *
+     * @param nums
+     * @return
+     */
+    public int firstMissingPositive(int[] nums) {
+        int n = nums.length;
+        for (int i = 0; i < n; i++) {
+            while (nums[i] > 0 && nums[i] <= n && nums[i] != nums[nums[i] - 1]) {
+                int temp = nums[nums[i] - 1];
+                nums[nums[i] - 1] = nums[i];
+                nums[i] = temp;
+
+            }
+        }
+        for (int i = 0; i < n; i++) {
+            if (nums[i] - 1 != i) {
+                return i + 1;
+            }
+        }
+        return n + 1;
+    }
+
+    /**
+     * 接雨水，单调栈。栈只能放索引下标不能放元素，因为下标要拿出来计算宽度。
+     *
+     * @param height
+     * @return
+     */
+    public int trap(int[] height) {
+        Stack<Integer> stack = new Stack<>();
+        int res = 0;
+        if (height == null || height.length <= 2) {
+            return 0;
+        }
+        for (int i = 0; i < height.length; i++) {
+            while (!stack.isEmpty() && height[stack.peek()] < height[i]) {
+                int top = stack.pop();
+                if (stack.isEmpty()) {
+                    continue;
+                }
+                int left = stack.peek();
+                int width = i - left - 1;
+                int hegiht = Math.min(height[left], height[i]) - height[top];
+                res = res + width * hegiht;
+
+            }
+            stack.push(i);
+        }
+        return res;
+    }
+
+    /**
+     * 55螺旋矩阵。生成顺时针二维数组。
+     *
+     * @param n
+     * @return
+     */
+    public int[][] generateMatrix(int n) {
+        int[][] res = new int[n][];
+
+        //鸽了
+        return new int[][]{};
+    }
+
     /**
      * 77 组合+剪枝优化。
      */
-    List<List<Integer>> res=new LinkedList<>();
-    LinkedList<Integer> list=new LinkedList<>();
+    List<List<Integer>> res = new LinkedList<>();
+    LinkedList<Integer> list = new LinkedList<>();
+
     public List<List<Integer>> combine(int n, int k) {
-        function(n,k,1);
+        function(n, k, 1);
         return res;
     }
-    void function(int n,int k,int j){
-        if(list.size()==k){
+
+    void function(int n, int k, int j) {
+        if (list.size() == k) {
             res.add(new LinkedList<>(list));
             return;
         }
-        for(int i=j;i<=n-(k-list.size())+1;i++){
+        for (int i = j; i <= n - (k - list.size()) + 1; i++) {
             list.add(i);
-            function(n,k,i+1);
+            function(n, k, i + 1);
             list.removeLast();
         }
+    }
+
+
+    int ans = Integer.MIN_VALUE;
+
+    /**
+     * 124 hard 二叉树的最大路径和。
+     * 一个节点作为最大路径上面的节点只有两种情况。
+     * 1.自己+左右子树就是最大路径。
+     * 2.自己或者自己带着左右子树其中一个跟着父节点的最大路径
+     *
+     * @param root
+     * @return
+     */
+    public int maxPathSum(TreeNode root) {
+        function(root);
+        return ans;
+    }
+
+    int function(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        int left = Math.max(function(root.left), 0);//这边要和0比较，小于0肯定不是，只要当前节点，不要左右节点。
+        int right = Math.max(function(root.right), 0);
+        ans = Math.max(ans, root.val + left + right);
+
+        return Math.max(left, right) + root.val;
     }
 
 
@@ -242,18 +388,20 @@ public class codevolcano {
      * @return
      */
     public ListNode deleteDuplicates(ListNode head) {
-        if(head==null){return head;}
-        ListNode pre=new ListNode(0);
-        pre.next=head;
-        ListNode slow=pre;
-        while(slow.next!=null&&slow.next.next!=null){
-            if(slow.next.val==slow.next.next.val){
-                int x=slow.next.val;//这里要保留值，不然到下一个节点了找不到原节点值判断了。
-                while(slow.next!=null&&slow.next.val==x){
-                    slow.next=slow.next.next;//这里是把重复节点删除了（包括重复自身）
+        if (head == null) {
+            return head;
+        }
+        ListNode pre = new ListNode(0);
+        pre.next = head;
+        ListNode slow = pre;
+        while (slow.next != null && slow.next.next != null) {
+            if (slow.next.val == slow.next.next.val) {
+                int x = slow.next.val;//这里要保留值，不然到下一个节点了找不到原节点值判断了。
+                while (slow.next != null && slow.next.val == x) {
+                    slow.next = slow.next.next;//这里是把重复节点删除了（包括重复自身）
                 }
-            }else{
-                slow=slow.next;
+            } else {
+                slow = slow.next;
             }
 
         }
@@ -305,16 +453,16 @@ public class codevolcano {
         }
         HashMap<Character, Integer> map = new HashMap<>();
         char[] a = s.toCharArray();
-        int left=0;//窗口左指针。
-        int max=0;//max=i-left+1;i是右指针。
-         for (int i = 0; i < s.length(); i++) {
+        int left = 0;//窗口左指针。
+        int max = 0;//max=i-left+1;i是右指针。
+        for (int i = 0; i < s.length(); i++) {
             if (map.containsKey(a[i])) {
-                left = Math.max(left, map.get(a[i])+1 );
+                left = Math.max(left, map.get(a[i]) + 1);
                 //保证左指针不会后退,abba,碰到第二个b的时候,left=map.get(b)+1=2,再碰到第二个a，map.get(a)+1=1;left肯定要取最值。
-                System.out.println("left=="+left);//这里要用max比较是因为abba到a的时候，map.get(a)+1=0,不能让左下标变小了。所以取最大值。
+                System.out.println("left==" + left);//这里要用max比较是因为abba到a的时候，map.get(a)+1=0,不能让左下标变小了。所以取最大值。
             }
             map.put(a[i], i);
-            max = Math.max(max, i - left +1);// 右-左+1；
+            max = Math.max(max, i - left + 1);// 右-左+1；
         }
         return max;
     }
@@ -438,32 +586,43 @@ public class codevolcano {
 
     /**
      * 15 3数之和。O(n2)
+     *
      * @param nums
      * @return
      */
     public List<List<Integer>> threeSum(int[] nums) {
-        List<List<Integer>> res=new ArrayList<>();
-        if(nums==null||nums.length<3){return res;}
-        int len=nums.length;
+        List<List<Integer>> res = new ArrayList<>();
+        if (nums == null || nums.length < 3) {
+            return res;
+        }
+        int len = nums.length;
         Arrays.sort(nums);
-        for(int i=0;i<nums.length;i++){
-            if(nums[i]>0){break;}
-            if(i>0&&nums[i]==nums[i-1]){
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] > 0) {
+                break;
+            }
+            if (i > 0 && nums[i] == nums[i - 1]) {
                 continue;
             }
-            int L=i+1;
-            int R=len-1;
-            while(L<R){
-                int sum=nums[i]+nums[L]+nums[R];
-                if(sum==0){
-                    res.add(Arrays.asList(nums[i],nums[L],nums[R]));
-                    while(L<R&&nums[L]==nums[L+1]){L++;}
-                    while(L<R&&nums[R]==nums[R-1]){R--;}
+            int L = i + 1;
+            int R = len - 1;
+            while (L < R) {
+                int sum = nums[i] + nums[L] + nums[R];
+                if (sum == 0) {
+                    res.add(Arrays.asList(nums[i], nums[L], nums[R]));
+                    while (L < R && nums[L] == nums[L + 1]) {
+                        L++;
+                    }
+                    while (L < R && nums[R] == nums[R - 1]) {
+                        R--;
+                    }
                     L++;
                     R--;
+                } else if (sum > 0) {
+                    R--;
+                } else {
+                    L++;
                 }
-                else if(sum>0){R--;}
-                else {L++;}
             }
         }
         return res;
@@ -591,7 +750,8 @@ public class codevolcano {
     /**
      * 分治思想，就是递归参数，不好想，用map把中序遍历(value,key)放一遍，然后根据value查找索引。
      * 07重建二叉树，根据前序和中序遍历二叉树。
-     *麻烦在根索引的位置。
+     * 麻烦在根索引的位置。
+     *
      * @param preorder
      * @param inorder
      * @return
@@ -613,9 +773,8 @@ public class codevolcano {
     }
 
     /**
-     *
-     * @param root 根索引
-     * @param left 左边界
+     * @param root  根索引
+     * @param left  左边界
      * @param right 右边界。
      * @return
      */
@@ -666,54 +825,69 @@ public class codevolcano {
     /**
      * hot 34多个版本都会了，左右边界的问题,注意mid=right+left/2 是偏左的，4个元素，mid=第二个元素，所以找右边界的时候要偏右
      * 左边界：1。left<right 当num[mid]>=target :mid=right; 最后拿left当结果判断什么的。
-     *        2。left<=right 当num[mid]>=target :mid=right-1;最后判断一下left越界或者是否不等于targt这种情况-1，剩下返回left；
-     *右边界：1。left<right, 当num[mid]<=target (mid=left+(right-left)/2+1):mid=left; 最后拿right当结果判断什么的。这里+1为了
-     *                                                                              防止while不会结束。left=mid=right
-     *      2。left<=right 当num[mid]<=target :mid=left+1;最后判断一下right<0越界或者是否不等于targt这种情况-1，剩下返回right；
+     * 2。left<=right 当num[mid]>=target :mid=right-1;最后判断一下left越界或者是否不等于targt这种情况-1，剩下返回left；
+     * 右边界：1。left<right, 当num[mid]<=target (mid=left+(right-left)/2+1):mid=left; 最后拿right当结果判断什么的。这里+1为了
+     * 防止while不会结束。left=mid=right
+     * 2。left<=right 当num[mid]<=target :mid=left+1;最后判断一下right<0越界或者是否不等于targt这种情况-1，剩下返回right；
+     * <p>
+     * 2版本容易写。1版本适用性强。我写的1版本，反正会。
      *
-     *     2版本容易写。1版本适用性强。我写的1版本，反正会。
      * @param d
      * @param target
      * @return
      */
-        int min=-1;
-        int max=-1;
-        public int[] searchRange(int[] nums, int target) {
-            if(nums.length==0||target>nums[nums.length-1]){return new int[]{-1,-1};}
-            return  function(nums,target);
+    int min = -1;
+    int max = -1;
 
+    public int[] searchRange(int[] nums, int target) {
+        if (nums.length == 0 || target > nums[nums.length - 1]) {
+            return new int[]{-1, -1};
         }
-        int[] function(int[] nums,int target){
-            //找左边界
-            int left=0;
-            int right=nums.length-1;
-            while(left<right){
-                int mid=left+(right-left)/2;
-                if(nums[mid]<target){
-                    left=mid+1;
-                }
-                else{
-                    right=mid;
-                }
+        return function(nums, target);
+
+    }
+
+    int[] function(int[] nums, int target) {
+        //找左边界
+        int left = 0;
+        int right = nums.length - 1;
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] < target) {
+                left = mid + 1;
+            } else {
+                right = mid;
             }
-            if(nums[left]==target){min=left;}else{min=-1;}
-            //如果左边界没找到或者在最大索引处，直接返回就是了不用找右边界。
-            if(min==-1){        return new int[]{-1,-1};}
-            if(min==nums.length-1||nums[min+1]!=target){return new int[]{min,min};}
-            left=0;
-            right=nums.length-1;
-            while(left<right){
-                int mid=left+(right-left)/2+1;
-                if(nums[mid]>target){
-                    right=mid-1;
-                }
-                else{
-                    left=mid;
-                }
-            }
-            if(nums[right]==target){max=right;}else{max=-1;}
-            return new int[]{min,max};
         }
+        if (nums[left] == target) {
+            min = left;
+        } else {
+            min = -1;
+        }
+        //如果左边界没找到或者在最大索引处，直接返回就是了不用找右边界。
+        if (min == -1) {
+            return new int[]{-1, -1};
+        }
+        if (min == nums.length - 1 || nums[min + 1] != target) {
+            return new int[]{min, min};
+        }
+        left = 0;
+        right = nums.length - 1;
+        while (left < right) {
+            int mid = left + (right - left) / 2 + 1;
+            if (nums[mid] > target) {
+                right = mid - 1;
+            } else {
+                left = mid;
+            }
+        }
+        if (nums[right] == target) {
+            max = right;
+        } else {
+            max = -1;
+        }
+        return new int[]{min, max};
+    }
 
 
     //https://mp.weixin.qq.com/s?__biz=MzAxODQxMDM0Mw==&mid=2247485044&idx=1&sn=e6b95782141c17abe206bfe2323a4226&scene=21
@@ -740,6 +914,26 @@ public class codevolcano {
     }
 
     /**
+     * 剑指 Offer 52. 两个链表的第一个公共节点
+     *
+     * @param headA
+     * @param headB
+     * @return
+     */
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        if (headA == null || headB == null) {
+            return null;
+        }
+        ListNode A = headA;
+        ListNode B = headB;
+        while (A != B) {//不相交跳出循环，就用null，所以是判断A!=null而不是A.next！=null
+            A = A != null ? A.next : headB;
+            B = B != null ? B.next : headA;
+        }
+        return A;
+    }
+
+    /**
      * 剑指53，二分变种，寻找target出现多少次。
      *
      * @param nums
@@ -748,7 +942,7 @@ public class codevolcano {
      */
     public int search(int[] nums, int target) {
         //todo 53二分变种
-        LinkedList list=new LinkedList<>();
+        LinkedList list = new LinkedList<>();
         return 0;
     }
 
@@ -856,52 +1050,52 @@ class eightsorts {
 /**
  * LRU 终于来了。要实现双向链表的api，Doublelist提供api，node创建结构。
  */
-class LRUCache {
-    private HashMap<Integer, Node> map;
-    private DoubleList cache;
-    private int cap;
-
-    public LRUCache(int capacity) {
-        this.cap=capacity;
-        map=new HashMap<>();
-        cache=new DoubleList();
-    }
-
-    public int get(int key) {
-        if(map.containsKey(key)){
-
-            cache.remove(map.get(key));
-            cache.addFirst(map.get(key));
-
-            //上面👆这2行可以直接用下面这2行替换。
-            Node node=map.get(key);
-            put(key,node.val);
-
-
-            return node.val;
-        }
-        else {return -1;}
-    }
-
-    public void put(int key, int value) {
-        Node node=new Node(key,value);
-        if(map.containsKey(key)){
-            Node temp=map.get(key);
-            cache.remove(temp);
-            map.put(key,node);
-            cache.addFirst(node);
-        }
-        else {
-
-            if(cache.size()+1>cap){
-              Node temp1=  cache.removeLast();
-              map.remove(temp1.key);
-            }
-            cache.addFirst(node);
-            map.put(key,node);
-        }
-    }
-}
+//class LRUCache {
+//    private HashMap<Integer, Node> map;
+//    private DoubleList cache;
+//    private int cap;
+//
+//    public LRUCache(int capacity) {
+//        this.cap=capacity;
+//        map=new HashMap<>();
+//        cache=new DoubleList();
+//    }
+//
+//    public int get(int key) {
+//        if(map.containsKey(key)){
+//
+//            cache.remove(map.get(key));
+//            cache.addFirst(map.get(key));
+//
+//            //上面👆这2行可以直接用下面这2行替换。
+//            Node node=map.get(key);
+//            put(key,node.val);
+//
+//
+//            return node.val;
+//        }
+//        else {return -1;}
+//    }
+//
+//    public void put(int key, int value) {
+//        Node node=new Node(key,value);
+//        if(map.containsKey(key)){
+//            Node temp=map.get(key);
+//            cache.remove(temp);
+//            map.put(key,node);
+//            cache.addFirst(node);
+//        }
+//        else {
+//
+//            if(cache.size()+1>cap){
+//              Node temp1=  cache.removeLast();
+//              map.remove(temp1.key);
+//            }
+//            cache.addFirst(node);
+//            map.put(key,node);
+//        }
+//    }
+//}
 
 /**
  * node, map 放<key,node>，和双向链表。
@@ -909,11 +1103,13 @@ class LRUCache {
 class Node {
     public int key, val;
     public Node next, prev;
+
     public Node(int k, int v) {
         this.key = k;
         this.val = v;
     }
 }
+
 /**
  * 双向链表。
  */
@@ -923,40 +1119,37 @@ class DoubleList {
     private int size;
 
     public void addFirst(Node node) {
-        if(head==null){
-            head=tail=node;
+        if (head == null) {
+            head = tail = node;
+        } else {
+            node.next = head;
+            head.prev = node;
+            head = node;
         }
-       else {
-            node.next=head;
-            head.prev=node;
-            head=node;
-        }
-       size++;
+        size++;
     }
 
 
     public void remove(Node node) {
-         if(head==node&&node==tail){
-            head=null;
-            tail=null;
+        if (head == node && node == tail) {
+            head = null;
+            tail = null;
+        } else if (node == head) {
+            head = head.next;
+            head.prev = null;
+        } else if (node == tail) {
+            tail = tail.prev;
+            tail.next = null;
+        } else {
+            node.prev.next = node.next;
+            node.next.prev = node.prev;
         }
-        else if(node==head){
-            head=head.next;
-            head.prev=null;
-        }
-        else if(node==tail){
-            tail=tail.prev;
-            tail.next=null;
-        }else {
-            node.prev.next=node.next;
-            node.next.prev=node.prev;
-         }
         size--;
 
     }
 
     public Node removeLast() {
-        Node res=tail;
+        Node res = tail;
         remove(res);
         return res;
     }
@@ -965,6 +1158,7 @@ class DoubleList {
         return size;
     }
 }
+
 /**
  * 09 双栈实现队列,pop的时候，如果第二个栈空的，要把第一个栈清空。全部放入第二个栈。
  */
