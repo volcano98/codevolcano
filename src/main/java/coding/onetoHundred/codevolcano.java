@@ -1,30 +1,497 @@
-package coding.serivce;
-
+package src.main.java.coding.onetoHundred;
 
 import java.util.*;
 
-/**
- * @author : can
- * create at:  2021/11/28  20:05
- * @description: 记录写过的算法
- */
-class ListNode {
-    int val;
-    ListNode next;
-
-    public ListNode(int val) {
-        this.val = val;
-    }
-}
-
 public class codevolcano {
-
     public static void main(String[] args) {
+//        [12,24,8,32]
+//        [13,25,32,11]
+//        int[] s = advantageCount(new int[]{12, 24, 8, 32}, new int[]{13, 25, 32, 11});
+//        System.out.println(s);
+        //干不过，就用nums2中的上等马的下标当作nums1中的下等马的下标
 
-        int s = new codevolcano().lengthOfLongestSubstring("abba");
-        System.out.println(s);
-        // 唉，赶紧冲起来吧。时间不多了。
-//        System.out.println(a[a.length - 1][0]);
+        new codevolcano().generateTrees(3);
+
+    }
+
+    public List<TreeNode> generateTrees(int n) {
+        List<TreeNode> li = new ArrayList();
+        if (n == 0) return li;
+        return func(1, n);
+    }
+
+    List<TreeNode> func(int left, int right) {
+        List<TreeNode> res=new ArrayList<>();
+        if(left>right){
+            //不加null会导致，下面循环都无法进行。
+            res.add(null);
+            return res;
+        }
+        //每个节点拿到所有的可能。
+        for (int i = left; i <=right; i++) {
+            List<TreeNode> listLeft=func(left,i-1);
+            List<TreeNode> listRight=func(i+1,right);
+            for (TreeNode treeNode : listLeft) {
+                for (TreeNode node : listRight) {
+                    TreeNode now=new TreeNode(i);
+                    now.left=treeNode;
+                    now.right=node;
+                    res.add(now);
+                }
+            }
+        }
+        return res;
+    }
+
+
+
+//    public List<List<Integer>> verticalOrder(TreeNode root) {
+//        if (root.left != null) verticalOrder(root.left);
+//        list.add(root.val);
+//
+//    }
+
+    public static int[] advantageCount(int[] nums1, int[] nums2) {
+        //田忌赛马，1里面的最小值，和2的最小值比，大于直接拿下，小于就比较最大值。
+        // 从1里面找到最小大于2的数字，然后排列。贪心应该是从2里面比较小的开始比较。
+        int[][] index = new int[nums2.length][2];
+        for (int i = 0; i < nums2.length; i++) {
+            index[i] = new int[]{nums2[i], i};
+        }
+        // 1 小到大， 2 小到大。
+        Arrays.sort(nums1);
+        Arrays.sort(index, (o1, o2) -> o1[0] - o2[0]);
+        int left = 0;
+        int right = nums2.length - 1;
+        int res[] = new int[nums2.length];
+        //
+        for (int num : nums1) {
+            if (num > index[left][0]) {
+                res[index[left][1]] = num;
+                left++;
+            } else {
+                res[index[right][1]] = num;
+                right--;
+            }
+        }
+        return res;
+    }
+
+
+    public int longestWPI(int[] hours) {
+        //最大长度。找出所有可能的长度。
+        for (int i = 0; i < hours.length; i++) {
+            if (hours[i] > 8) hours[i] = 1;
+            else hours[i] = -1;
+        }
+        int res = 0;
+        int[] arr = new int[hours.length + 1];
+        Stack<Integer> stack = new Stack();
+        for (int i = 1; i < arr.length; i++) {
+            arr[i] = arr[i - 1] + hours[i - 1];
+            System.out.print(arr[i] + " ");
+        }
+        for (int i = 0; i < arr.length; i++) {
+            while (stack.isEmpty() || arr[i] < arr[stack.peek()]) {
+                stack.push(i);
+            }
+        }
+        //找的是子序列大于
+        for (int i = arr.length - 1; i >= 0; i--) {
+            while (!stack.isEmpty() || arr[stack.peek()] <= arr[i]) {
+                res = Math.max(stack.pop() - i, res);
+            }
+        }
+        return res;
+    }
+
+    public int[] getModifiedArray(int length, int[][] updates) {
+        int arr[] = new int[length];
+        for (int i = 0; i < updates.length; i++) {
+            int start = updates[i][0];
+            int end = updates[i][1];
+            int len = updates[i][2];
+            arr[start] += len;
+            if (end + 1 < length) arr[end + 1] -= len;
+        }
+        for (int i = 1; i < arr.length; i++) {
+            arr[i] += arr[i - 1];
+        }
+        return arr;
+    }
+
+    public int[] constructArr(int[] a) {
+        int[] le = new int[a.length];
+        le[0] = a[0];
+        for (int i = 0; i < a.length; i++) {
+            if (i > 0) le[i] = le[i - 1] * a[i];
+            // System.out.print(le[i]+" ");
+        }
+        int[] re = new int[a.length];
+        re[0] = a[a.length - 1];
+
+        for (int i = 0; i < re.length; i++) {
+            if (i > 0) re[i] = a[a.length - 1 - i] * re[i - 1];
+            System.out.print(re[i] + " ");
+        }
+        int[] res = new int[a.length];
+        res[0] = re[re.length - 2];
+        res[res.length - 1] = le[le.length - 2];
+        for (int i = 1; i < res.length - 1; i++) {
+            res[i] = le[i - 1] * re[i + 1];
+        }
+        return res;
+    }
+
+    public int longestOnes(int[] A, int K) {
+
+        int N = A.length;
+        int res = 0;
+        int left = 0, right = 0;
+        int zeros = 0;
+        while (right < N) {
+            if (A[right] == 0)
+                zeros++;
+            while (zeros > K) {
+                if (A[left++] == 0)
+                    zeros--;
+            }
+            res = Math.max(res, right - left + 1);
+            right++;
+        }
+        return res;
+
+
+    }
+
+    public static int maxSubArrayLen(int[] nums, int k) {
+        HashMap<Integer, Integer> map = new HashMap<>();
+        int res = 0;
+        for (int i = 0; i < nums.length; i++) {
+            if (i > 0) nums[i] += nums[i - 1];
+            if (map.containsKey(nums[i] - k)) {
+                res = Math.max(res, i - map.get(nums[i] - k));
+            }
+            if (!map.containsKey(nums[i])) map.put(nums[i], i);
+        }
+        return res;
+    }
+
+    public int maxWidthRamp(int[] nums) {
+        Stack<Integer> stack = new Stack<>();
+        for (int i = nums.length - 1; i >= 0; i--) {
+            while (stack.isEmpty() || nums[stack.peek()] > nums[i]) {
+                stack.push(i);
+            }
+        }
+        int res = 0;
+        for (int length = nums.length - 1; length >= 0; length--) {
+            while (!stack.isEmpty() && nums[length] > nums[stack.peek()]) {
+                res = Math.max(res, length - stack.peek());
+                stack.pop();
+            }
+        }
+        return res;
+
+    }
+
+    public int[][] intervalIntersection(int[][] firstList, int[][] secondList) {
+        List<int[]> list = new ArrayList();
+        int l = 0, r = 0;
+        while (l < firstList.length && r < secondList.length) {
+            int left = Math.max(firstList[l][0], secondList[r][0]);
+            int right = Math.min(firstList[l][1], secondList[r][1]);
+            if (left <= right) list.add(new int[]{left, right});
+            if (firstList[l][1] > secondList[r][1]) {
+                r++;
+            } else l++;
+        }
+        return list.toArray(new int[list.size()][2]);
+    }
+
+    public static int lengthOfLongestSubstring(String s) {
+        int res = 0;
+        int left = 0;
+        HashMap<Character, Integer> map = new HashMap();
+        for (int i = 0; i < s.length(); i++) {
+            if (map.containsKey(s.charAt(i))) {
+                res = Math.max(res, i - left + 1);
+                //left 是不重复元素的第一个元素，abb
+                left = Math.max(left, map.get(s.charAt(i)) + 1);
+            }
+            map.put(s.charAt(i), i);
+            res = Math.max(res, i - left + 1);
+
+        }
+        return res;
+    }
+
+    public static String minWindow(String s, String t) {
+        HashMap<Character, Integer> window = new HashMap();
+        HashMap<Character, Integer> needs = new HashMap();
+        int res = Integer.MAX_VALUE;
+        int needLen = 0;
+        int left = 0;
+        int start = 0;
+        for (int i = 0; i < t.length(); i++) {
+            needs.put(t.charAt(i), needs.getOrDefault(t.charAt(i), 0) + 1);
+        }
+        for (int i = 0; i < s.length(); i++) {
+            Character temp = s.charAt(i);
+            window.put(temp, window.getOrDefault(temp, 0) + 1);
+            if (window.get(temp).equals(needs.get(temp))) {
+                needLen++;
+            }
+            while (needLen == needs.size()) {
+                if (i - left < res) {
+                    res = i - left;
+                    start = left;
+                }
+                if (needs.containsKey(s.charAt(left)) && window.get(s.charAt(left)).equals(needs.get(s.charAt(left))))
+                    needLen--;
+                window.put(s.charAt(left), window.get(s.charAt(left)) - 1);
+                left++;
+            }
+
+        }
+        return res == Integer.MAX_VALUE ? "" : s.substring(start, start + res + 1);
+    }
+
+
+    public static int subarraySum(int[] nums, int target) {
+        int res = Integer.MAX_VALUE;
+        int sum = 0;
+        int left = 0;
+        for (int i = 0; i < nums.length; i++) {
+
+            sum = sum + nums[i];
+            while (target <= sum) {
+                res = Math.min(res, i - left);
+                sum = sum - nums[left];
+                left++;
+            }
+        }
+        return res == Integer.MAX_VALUE ? 0 : res;
+
+    }
+
+    public static int[] corpFlightBookings(int[][] bookings, int n) {
+        int[] ans = new int[n];
+        for (int[] booking : bookings) {
+            ans[booking[0] - 1] += booking[2];
+            if (booking[1] < n) {
+                ans[booking[1]] -= booking[2];
+            }
+        }
+        for (int i = 1; i < n; i++) {
+            ans[i] += ans[i - 1];
+        }
+        return ans;
+
+    }
+
+    public int minMeetingRooms(int[][] intervals) {
+        int res = 0;
+        int arr[][] = new int[intervals.length * 2][2];
+
+        int i = 0;
+        for (int[] interval : intervals) {
+            arr[i++] = new int[]{interval[0], 1};
+            arr[i++] = new int[]{interval[1], -1};
+
+        }
+        Arrays.sort(arr, (o1, o2) -> {
+            if (o1[0] == o2[0]) {
+                return o1[1] - o2[1];
+            } else return o1[0] - o2[0];
+        });
+        int cur = 0;
+        for (int[] ints : arr) {
+            cur += ints[1];
+            res = Math.max(cur, res);
+        }
+        return res;
+    }
+
+    public boolean exist1(char[][] board, String word) {
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[0].length; j++) {
+                if (contain(board, word, i, j, 0)) return true;
+            }
+        }
+        return false;
+    }
+
+    boolean contain(char[][] board, String word, int i, int j, int k) {
+        if (i < 0 || j < 0 || i >= board.length || j >= board[0].length
+                || board[i][j] != word.charAt(k) || board[i][j] == '-') {
+            return false;
+        }
+        if (k == word.length() - 1) return true;
+
+        board[i][j] = '-';
+        boolean res = contain(board, word, i + 1, j, k + 1) ||
+                contain(board, word, i - 1, j, k + 1) ||
+                contain(board, word, i, j + 1, k + 1) ||
+                contain(board, word, i, j - 1, k + 1);
+        board[i][j] = word.charAt(k);
+        return res;
+
+    }
+
+    public int[] sortArray(int[] nums) {
+        quicksort(nums, 0, nums.length - 1);
+        return nums;
+    }
+
+    void quicksort(int[] nums, int left, int right) {
+        if (left < right) {
+            int a = adjust(nums, left, right);
+            quicksort(nums, left, a - 1);
+            quicksort(nums, a + 1, right);
+        }
+
+    }
+
+    int adjust(int[] nums, int left, int right) {
+        int base = new Random().nextInt(right - left + 1) + left;
+        int target = nums[base];
+        swap(nums, base, right);
+        int l = left, r = right;
+        while (l < r) {
+            while (l < r && nums[l] <= target) l++;
+            while (l < r && nums[r] >= target) r--;
+
+            if (l < r) swap(nums, l, r);
+        }
+        swap(nums, r, right);
+        return l;
+    }
+
+    public void sortColors(int[] nums, int left, int right) {
+        int l = left;
+        int r = right;
+        int base = nums[l];
+        while (l < r) {
+            while (l < r && nums[r] >= base) {
+                r--;
+            }
+            if (l < r) {
+                nums[l] = nums[r];
+            }
+            while (l < r && nums[l] <= base) {
+                l++;
+            }
+            if (l < r) {
+                nums[r] = nums[l];
+            }
+        }
+        nums[l] = base;
+        sortColors(nums, left, l - 1);
+        sortColors(nums, l + 1, r);
+    }
+
+    public int minPathSum(int[][] grid) {
+        int m = grid.length;
+        int n = grid[0].length;
+        int[][] dp = new int[m][n];
+        dp[0][0] = grid[0][0];
+        for (int i = 1; i < dp[0].length; i++) {
+            dp[0][i] = dp[0][i - 1] + grid[0][i];
+        }
+        for (int i = 1; i < dp.length; i++) {
+            dp[i][0] = dp[i - 1][0] + grid[i][0];
+            for (int j = 1; j < dp[0].length; j++) {
+                dp[i][j] = Math.min(dp[i - 1][j], dp[i][j - 1]) + grid[i][j];
+                System.out.println(dp[i][j]);
+            }
+        }
+        return dp[m - 1][n - 1];
+    }
+
+    public int uniquePaths(int m, int n) {
+        int[][] dp = new int[m][n];
+        for (int i = 0; i < dp.length; i++) {
+            dp[i][0] = 1;
+            for (int j = 0; j < dp[0].length; j++) {
+                dp[0][j] = 1;
+                if (i == 0 || j == 0) continue;
+                dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+            }
+        }
+        return dp[m - 1][n - 1];
+    }
+
+    public boolean canJump(int[] nums) {
+        int maxroad = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            if (i > maxroad) {
+                return false;
+            } else maxroad = Math.max(maxroad, i + nums[i]);
+        }
+        return maxroad >= nums[nums.length - 1];
+    }
+
+    /**
+     * @param nums
+     * @return
+     */
+    public int maxSubArray(int[] nums) {
+        int sum = Integer.MIN_VALUE;
+        int res = Integer.MIN_VALUE;
+        for (int num : nums) {
+            if (sum >= 0) {
+                sum += num;
+            } else sum = num;
+            res = Math.max(res, sum);
+        }
+        return res;
+    }
+
+    /**
+     * 字母异位词
+     */
+    public List<List<String>> groupAnagrams(String[] strs) {
+        List<char[]> characters = new ArrayList<>();
+        HashMap<String, List<String>> map = new HashMap<>();
+        for (String str : strs) {
+            char[] temp = str.toCharArray();
+            Arrays.sort(temp);
+            characters.add(temp);
+            String temp1 = Arrays.toString(temp);
+            if (map.containsKey(temp1)) {
+                map.get(temp1).add(str);
+            } else {
+                List<String> s = new ArrayList<>();
+                s.add(str);
+                map.put(temp1, s);
+            }
+        }
+        List<List<String>> res = new ArrayList<>(map.values());
+        return res;
+
+    }
+
+    /**
+     * 48 旋转图像
+     * 先中心翻转，再左右翻转。
+     */
+
+    public void rotate(int[][] matrix) {
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = i; j < matrix[0].length; j++) {
+                int temp = matrix[i][j];
+                matrix[i][j] = matrix[j][i];
+                matrix[j][i] = temp;
+            }
+        }
+        for (int i = 0; i < matrix.length / 2; i++) {
+            for (int j = 0; j < matrix[0].length / 2; j++) {
+                int temp = matrix[i][j];
+                matrix[i][j] = matrix[i][matrix[0].length - 1 - j];
+                matrix[i][matrix[0].length - 1 - j] = temp;
+            }
+        }
 
     }
 
@@ -224,6 +691,7 @@ public class codevolcano {
             return 0;
         }
 
+
         int cout = 1; //有元素最小是1。
         HashSet<Integer> set = new HashSet<>();
         for (int num : nums) {
@@ -250,7 +718,7 @@ public class codevolcano {
     public List<Integer> rightSideView(TreeNode root) {
 
         List<Integer> list = new LinkedList<>();
-        Queue<TreeNode> queue = new LinkedList();
+        Queue<TreeNode> queue = new LinkedList<>();
         if (root != null) {
             queue.add(root);
         }
@@ -421,13 +889,13 @@ public class codevolcano {
 
         List<int[]> ans = new ArrayList<>();
         Arrays.sort(intervals, (o1, o2) -> o1[0] == o2[0] ? o1[1] - o2[1] : o1[0] - o2[0]);
-        int start = intervals[0][0], end = intervals[0][1];
+        int start = intervals[0][0];
+        int end = intervals[0][1];
         for (int i = 1; i < intervals.length; i++) {
-            if (intervals[i][0] <= end) {//两个区间有重叠
+            if (intervals[i][0] <= end) {
                 end = Math.max(end, intervals[i][1]);
             } else {
-                //两个区间没有重叠，保存[start,end]，然后更新
-                ans.add(new int[]{start, end});
+                ans.add(new int[]{intervals[i][0], intervals[i][1]});
                 start = intervals[i][0];
                 end = intervals[i][1];
             }
@@ -446,26 +914,6 @@ public class codevolcano {
      * @param s
      * @return
      */
-    public int lengthOfLongestSubstring(String s) {
-        //思路：滑动窗口,left为最大不重复的左值下标，max是长度。i是右值下标
-        if (s.length() == 0) {
-            return -1;
-        }
-        HashMap<Character, Integer> map = new HashMap<>();
-        char[] a = s.toCharArray();
-        int left = 0;//窗口左指针。
-        int max = 0;//max=i-left+1;i是右指针。
-        for (int i = 0; i < s.length(); i++) {
-            if (map.containsKey(a[i])) {
-                left = Math.max(left, map.get(a[i]) + 1);
-                //保证左指针不会后退,abba,碰到第二个b的时候,left=map.get(b)+1=2,再碰到第二个a，map.get(a)+1=1;left肯定要取最值。
-                System.out.println("left==" + left);//这里要用max比较是因为abba到a的时候，map.get(a)+1=0,不能让左下标变小了。所以取最大值。
-            }
-            map.put(a[i], i);
-            max = Math.max(max, i - left + 1);// 右-左+1；
-        }
-        return max;
-    }
 
     /**下面是剑指offer*************/
     /*****************************************************************************************************************************/
@@ -528,7 +976,7 @@ public class codevolcano {
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[0].length; j++) {
 
-                if (dfs(board, word, i, j, 0)) {
+                if (fs(board, word, i, j, 0)) {
                     return true;
                 }
             }
@@ -536,7 +984,7 @@ public class codevolcano {
         return false;
     }
 
-    public boolean dfs(char[][] board, String word, int i, int j, int k) {
+    public boolean fs(char[][] board, String word, int i, int j, int k) {
         if (i >= board.length || i < 0 || j >= board[0].length || j < 0 || board[i][j] != word.charAt(k)) {
             return false;
         }
@@ -545,8 +993,8 @@ public class codevolcano {
         }
         //标记为
         board[i][j] = '\0';
-        boolean res = dfs(board, word, i + 1, j, k + 1) || dfs(board, word, i - 1, j, k + 1)
-                || dfs(board, word, i, j + 1, k + 1) || dfs(board, word, i, j - 1, k + 1);
+        boolean res = fs(board, word, i + 1, j, k + 1) || fs(board, word, i - 1, j, k + 1)
+                || fs(board, word, i, j + 1, k + 1) || fs(board, word, i, j - 1, k + 1);
         board[i][j] = word.charAt(k);
         return res;
     }
@@ -741,7 +1189,7 @@ public class codevolcano {
                     d--;
                 }
             }
-            res.add(new ArrayList(listc));
+            res.add(new ArrayList<>(listc));
         }
         return res;
     }
@@ -942,7 +1390,7 @@ public class codevolcano {
      */
     public int search(int[] nums, int target) {
         //todo 53二分变种
-        LinkedList list = new LinkedList<>();
+        LinkedList<Object> list = new LinkedList<>();
         return 0;
     }
 
@@ -1163,8 +1611,8 @@ class DoubleList {
  * 09 双栈实现队列,pop的时候，如果第二个栈空的，要把第一个栈清空。全部放入第二个栈。
  */
 class StackQueue {
-    Stack stack = new Stack();
-    Stack stack1 = new Stack();
+    Stack<TreeNode> stack = new Stack<>();
+    Stack<TreeNode> stack1 = new Stack<>();
 
     void push(TreeNode k) {
         stack.push(k);
@@ -1182,28 +1630,6 @@ class StackQueue {
 
         }
         stack1.pop();
-    }
-}
-
-/**
- * 定义TreeNode{}
- */
-class TreeNode {
-    int val;
-    TreeNode left;
-    TreeNode right;
-
-    TreeNode() {
-    }
-
-    TreeNode(int val) {
-        this.val = val;
-    }
-
-    TreeNode(int val, TreeNode left, TreeNode right) {
-        this.val = val;
-        this.left = left;
-        this.right = right;
     }
 }
 

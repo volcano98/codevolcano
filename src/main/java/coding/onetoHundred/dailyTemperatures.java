@@ -1,4 +1,4 @@
-package coding.leetcode.hot100;
+package coding.onetoHundred;
 
 
 import java.util.*;

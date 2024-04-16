@@ -1,12 +1,6 @@
 package coding.dynamic_programming;
 
-import com.beust.ah.A;
-
-import java.lang.invoke.StringConcatFactory;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author : can
@@ -118,10 +112,10 @@ public class zeronepackge {
         for (int i = 1; i < nums.length; i++) {
             for (int j = 0; j < i; j++) {
                 if (nums[i] > nums[j]) {
-                    dp[i] = Math.max(dp[i],dp[j]+1);
+                    dp[i] = Math.max(dp[i], dp[j] + 1);
                 }
             }
-            res=Math.max(res,dp[i]);
+            res = Math.max(res, dp[i]);
         }
         System.out.print("\n" + "[");
         for (int i = 0; i < dp.length; i++) {
@@ -135,21 +129,36 @@ public class zeronepackge {
         return res;
     }
 
+//给定 n 个非负整数表示每个宽度为 1 的柱子的高度图，计算按此排列的柱子，下雨之后能接多少雨水。
+    //输入：height = [0,1,0,2,1,0,1,3,2,1,2,1]
+//输出：6
+//解释：上面是由数组 [0,1,0,2,1,0,1,3,2,1,2,1] 表示的高度图，在这种情况下，可以接 6 个单位的雨水（蓝色部分表示雨水）。
+
+    public static int trap(int[] height) {
+        // stack 小于栈顶放进去，大于栈顶，就
+        Stack<Integer> stack = new Stack<>();
+        int res = 0;
+        for (int i = 0; i < height.length; i++) {
+            while (!stack.isEmpty() && height[i] > height[stack.peek()]) {
+                int cur=stack.pop();
+                if (stack.isEmpty()) {
+                    break;
+                }
+                int left = stack.peek();
+                int w = i - 1 - left;
+                int h = Math.min(height[i], height[left])-height[cur];
+                res = w * h + res;
+            }
+            stack.push(i);
+        }
+        return res;
+    }
+
+
     public static void main(String[] args) {
-       int res= new zeronepackge().findNumberOfLIS(new int[]{1, 2, 4, 3, 5, 4, 7, 2});
+        int res = trap(new int[]{0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1});
         System.out.println(res);
     }
 
-    //给你一个整数数组 coins 表示不同面额的硬币，另给一个整数 amount 表示总金额。
-    //
-    //请你计算并返回可以凑成总金额的硬币组合数。如果任何硬币组合都无法凑出总金额，返回 0 。
-    //
-    //假设每一种面额的硬币有无限个。
-    //dp[i][j]前i个硬币能够凑成总金额为j的种类。
-    //dp[]
-    //题目数据保证结果符合 32 位带符号整数。
-    //
-    public int change(int amount, int[] coins) {
-        return 1;
-    }
+
 }
