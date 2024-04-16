@@ -1,6 +1,6 @@
-package du;
+package src.main.java.du;
 
-import coding.onetoHundred.ListNode;
+import src.main.java.coding.onetoHundred.ListNode;
 
 /**
  * @author : can

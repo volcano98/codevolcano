@@ -1,7 +1,7 @@
-import coding.onetoHundred.ListNode;
+package src.main.java;
 
-import java.util.*;
 
+import src.main.java.coding.onetoHundred.ListNode;
 
 /**
  * @author : can

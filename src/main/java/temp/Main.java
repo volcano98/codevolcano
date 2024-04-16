@@ -1,7 +1,8 @@
 package src.main.java.temp;
 
-import coding.onetoHundred.ListNode;
-import coding.onetoHundred.TreeNode;
+
+import src.main.java.coding.onetoHundred.ListNode;
+import src.main.java.coding.onetoHundred.TreeNode;
 
 import java.util.*;
 

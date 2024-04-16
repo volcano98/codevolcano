@@ -1,6 +1,7 @@
-package Sort;
+package src.main.java.Sort;
 
-import coding.onetoHundred.ListNode;
+
+import src.main.java.coding.onetoHundred.ListNode;
 
 import java.util.*;
 
