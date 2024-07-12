@@ -1,4 +1,4 @@
-package src.main.java.dailyStudy;
+package dailyStudy;
 
 public class April {
     /**
