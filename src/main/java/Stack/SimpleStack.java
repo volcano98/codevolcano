@@ -3,6 +3,8 @@ package Stack;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static Stack.SimpleStack.Solution.secondGreaterElement;
+
 public class SimpleStack {
     //最大矩形
     //找到只包含1的最大矩形
@@ -137,8 +139,46 @@ public class SimpleStack {
     }
 
     public static void main(String[] args) {
-        boolean[] s = new boolean[2];
-        System.out.println(s[0]);
+        int[] s = secondGreaterElement(new int[]{1, 17, 18, 0, 18, 10, 20, 0});
+    }
+
+    static class Solution {
+        public static int[] secondGreaterElement(int[] nums) {
+            Map<Integer, Integer> map = new HashMap<>();//记录第一大元素。key:元素i， value：元素i的下一个最大元素。
+            Deque<Integer> stack = new ArrayDeque<>();
+            Deque<Integer> stack2 = new ArrayDeque<>();
+            Deque<Integer> stack3 = new ArrayDeque<>();
+            int[] res = new int[nums.length];
+            for (int i = 0; i < nums.length; i++) {
+                while (!stack.isEmpty() && nums[i] > nums[stack.peek()]) {
+                    //比栈顶元素大，则是第一大元素。 value存的j。意味着针对i，从i～j，nums[j]，是第一个大于>nums[i]的元素。
+                    //只需要从j出发，再找一次比i大的元素即可。
+                    int j = stack.pop(); // nums[i] 是 nums[j]  的第一大元素。
+                    //太复杂
+//                    for (int k = i+1; k < nums.length; k++) {
+//                        if(nums[k]>nums[j]){//
+//                            map.put(nums[j],nums[k]);
+//                            break;//找到第一个元素直接返回。
+//                        }
+//                    }
+                    res[j] = nums[i];
+                }
+                //维护最近的第一大的值，单调递减栈。
+                while (!stack2.isEmpty() && nums[i] >= nums[stack2.peek()]) {
+                    stack3.push(stack2.pop());
+                }
+                while (!stack3.isEmpty()) {
+                    stack.push(stack3.pop());
+                }
+
+                stack2.push(i);
+            }
+            // map已经维护了第二大值。
+//            for (int i = 0; i < nums.length; i++) {
+//                res[i] = map.getOrDefault(nums[i],-1);
+//            }
+            return res;
+        }
     }
 
 }
